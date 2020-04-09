@@ -1,7 +1,5 @@
-// @flow
-
-import type { ClickEvent, FeatureCollection } from '@nebula.gl/edit-modes';
-import type { ModeProps } from '../types';
+import { ClickEvent, FeatureCollection } from '@nebula.gl/edit-modes';
+import { ModeProps } from '../types';
 
 import { ELEMENT_TYPE } from '../constants';
 import BaseMode from './base-mode';
@@ -14,21 +12,23 @@ export default class SelectMode extends BaseMode {
     if (pickedObject && isNumeric(pickedObject.featureIndex)) {
       const selectedFeatureIndex = pickedObject.featureIndex;
       const selectedFeature = this.getSelectedFeature(props, selectedFeatureIndex);
+      // @ts-ignore
       props.onSelect({
         selectedFeature,
         selectedFeatureIndex,
         selectedEditHandleIndex:
           pickedObject.type === ELEMENT_TYPE.EDIT_HANDLE ? pickedObject.index : null,
         mapCoords,
-        screenCoords
+        screenCoords,
       });
     } else {
+      // @ts-ignore
       props.onSelect({
         selectedFeature: null,
         selectedFeatureIndex: null,
         selectedEditHandleIndex: null,
         mapCoords,
-        screenCoords
+        screenCoords,
       });
     }
   }

@@ -6,7 +6,7 @@ const RECT_STYLE = {
   x: -6,
   y: -6,
   height: 12,
-  width: 12
+  width: 12,
 };
 
 const CIRCLE_RADIUS = 8;
@@ -15,21 +15,21 @@ const SELECTED_STYLE = {
   stroke: '#7ac943',
   strokeWidth: 2,
   fill: '#ffff00',
-  fillOpacity: 0.7
+  fillOpacity: 0.7,
 };
 
 const HOVERED_STYLE = {
   stroke: '#7ac943',
   strokeWidth: 2,
   fill: '#7ac943',
-  fillOpacity: 0.5
+  fillOpacity: 0.5,
 };
 
 const UNCOMMITTED_STYLE = {
   stroke: '#a7a7a7',
   strokeWidth: 2,
   fill: '#a9a9a9',
-  fillOpacity: 0.3
+  fillOpacity: 0.3,
 };
 
 const INACTIVE_STYLE = UNCOMMITTED_STYLE;
@@ -38,7 +38,7 @@ const DEFAULT_STYLE = {
   stroke: '#000000',
   strokeWidth: 2,
   fill: '#a9a9a9',
-  fillOpacity: 0.1
+  fillOpacity: 0.1,
 };
 
 export function featureStyle({ feature, state }) {
@@ -78,11 +78,13 @@ export function featureStyle({ feature, state }) {
       if (state === RENDER_STATE.CLOSING) {
         style.strokeDasharray = '4,2';
       }
+
       break;
     case RENDER_TYPE.RECTANGLE:
       if (state === RENDER_STATE.UNCOMMITTED) {
         style.strokeDasharray = '4,2';
       }
+
       break;
     default:
   }
@@ -116,6 +118,7 @@ export function editHandleStyle({ feature, shape, index, state }) {
 
   switch (shape) {
     case 'circle':
+      //@ts-ignore
       style.r = CIRCLE_RADIUS;
       break;
     case 'rect':

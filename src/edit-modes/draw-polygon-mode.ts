@@ -1,8 +1,7 @@
-// @flow
-import type { ClickEvent, Feature, FeatureCollection } from '@nebula.gl/edit-modes';
+import { ClickEvent, Feature, FeatureCollection } from '@nebula.gl/edit-modes';
 import uuid from 'uuid/v1';
 
-import type { ModeProps } from '../types';
+import { ModeProps } from '../types';
 import { EDIT_TYPE, GEOJSON_TYPE, GUIDE_TYPE, RENDER_TYPE } from '../constants';
 import { getFeatureCoordinates } from './utils';
 import BaseMode from './base-mode';
@@ -35,7 +34,7 @@ export default class DrawPolygonMode extends BaseMode {
       this._commitTentativeFeature(event, props);
     }
   };
-
+  // @ts-ignore
   getGuides = (props: ModeProps<FeatureCollection>) => {
     let tentativeFeature = this.getTentativeFeature();
     const coordinates = getFeatureCoordinates(tentativeFeature);
@@ -47,6 +46,7 @@ export default class DrawPolygonMode extends BaseMode {
     const event = props.lastPointerMoveEvent;
 
     // existing editHandles + cursorEditHandle
+    // @ts-ignore
     const editHandles = this.getEditHandlesFromFeature(tentativeFeature) || [];
     const cursorEditHandle = {
       type: 'Feature',
@@ -54,12 +54,12 @@ export default class DrawPolygonMode extends BaseMode {
         guideType: GUIDE_TYPE.CURSOR_EDIT_HANDLE,
         // TODO remove renderType
         renderType: RENDER_TYPE.POLYGON,
-        positionIndexes: [editHandles.length]
+        positionIndexes: [editHandles.length],
       },
       geometry: {
         type: GEOJSON_TYPE.POINT,
-        coordinates: [event.mapCoords]
-      }
+        coordinates: [event.mapCoords],
+      },
     };
     editHandles.push(cursorEditHandle);
 
@@ -68,13 +68,14 @@ export default class DrawPolygonMode extends BaseMode {
       ...tentativeFeature,
       geometry: {
         type: GEOJSON_TYPE.LINE_STRING,
-        coordinates: [...coordinates, event.mapCoords]
-      }
+        // @ts-ignore
+        coordinates: [...coordinates, event.mapCoords],
+      },
     };
 
     return {
       tentativeFeature,
-      editHandles
+      editHandles,
     };
   };
 
@@ -87,13 +88,15 @@ export default class DrawPolygonMode extends BaseMode {
       ...tentativeFeature,
       geometry: {
         type: GEOJSON_TYPE.LINE_STRING,
-        coordinates: [...tentativeFeature.geometry.coordinates, event.mapCoords]
-      }
+        // @ts-ignore
+        coordinates: [...tentativeFeature.geometry.coordinates, event.mapCoords],
+      },
     };
     this.setTentativeFeature(tentativeFeature);
 
     props.onEdit({
       editType: EDIT_TYPE.ADD_POSITION,
+      // @ts-ignore
       updatedData: props.data.getObject(),
       editContext: [
         {
@@ -101,9 +104,9 @@ export default class DrawPolygonMode extends BaseMode {
           featureIndex: null,
           editHandleIndex: tentativeFeature.geometry.coordinates.length - 1,
           screenCoords: event.screenCoords,
-          mapCoords: event.mapCoords
-        }
-      ]
+          mapCoords: event.mapCoords,
+        },
+      ],
     });
   };
 
@@ -111,13 +114,13 @@ export default class DrawPolygonMode extends BaseMode {
     const tentativeFeature = this.getTentativeFeature();
     const { data } = props;
     this.setTentativeFeature(null);
-
+    // @ts-ignore
     const updatedData = data.addFeature(closePolygon(tentativeFeature)).getObject();
 
     props.onEdit({
       editType: EDIT_TYPE.ADD_FEATURE,
       updatedData,
-      editContext: null
+      editContext: null,
     });
   };
 
@@ -128,33 +131,36 @@ export default class DrawPolygonMode extends BaseMode {
         // TODO deprecate id
         id: uuid(),
         renderType: RENDER_TYPE.POLYGON,
-        guideType: GUIDE_TYPE.TENTATIVE
+        guideType: GUIDE_TYPE.TENTATIVE,
       },
+      // @ts-ignore
       geometry: {
         type: GEOJSON_TYPE.POINT,
-        coordinates: [event.mapCoords]
-      }
+        coordinates: [event.mapCoords],
+      },
     });
   };
 }
 
-function closePolygon(tentativeFeature: Feature): ?Feature {
+function closePolygon(tentativeFeature: Feature): Feature | null | undefined {
   // append point to the tail to close the polygon
   const coordinates = getFeatureCoordinates(tentativeFeature);
   if (!coordinates) {
     return undefined;
   }
+  // @ts-ignore
   coordinates.push(coordinates[0]);
   return {
     type: 'Feature',
     properties: {
       // TODO deprecate id
       id: tentativeFeature.properties.id,
-      renderType: RENDER_TYPE.POLYGON
+      renderType: RENDER_TYPE.POLYGON,
     },
     geometry: {
       type: GEOJSON_TYPE.POLYGON,
-      coordinates: [coordinates]
-    }
+      // @ts-ignore
+      coordinates: [coordinates],
+    },
   };
 }

@@ -1,9 +1,7 @@
-// @flow
-
 import uuid from 'uuid/v1';
 
-import type { ClickEvent, FeatureCollection } from '@nebula.gl/edit-modes';
-import type { ModeProps } from '../types';
+import { ClickEvent, FeatureCollection } from '@nebula.gl/edit-modes';
+import { ModeProps } from '../types';
 
 import { EDIT_TYPE, GEOJSON_TYPE, GUIDE_TYPE, RENDER_TYPE } from '../constants';
 import BaseMode from './base-mode';
@@ -24,8 +22,9 @@ export default class DrawLineStringMode extends BaseMode {
   handleDblClick(event: ClickEvent, props: ModeProps<FeatureCollection>) {
     this._commitTentativeFeature(event, props);
   }
-
+  // @ts-ignore
   getGuides = (props: ModeProps<FeatureCollection>) => {
+    // @ts-ignore
     const selectedFeature = this.getSelectedFeature(props);
     let tentativeFeature = this.getTentativeFeature();
 
@@ -39,6 +38,7 @@ export default class DrawLineStringMode extends BaseMode {
     const event = props.lastPointerMoveEvent;
 
     // existing editHandles + cursorEditHandle
+    // @ts-ignore
     const editHandles = this.getEditHandlesFromFeature(feature) || [];
     const cursorEditHandle = {
       type: 'Feature',
@@ -46,12 +46,12 @@ export default class DrawLineStringMode extends BaseMode {
         guideType: GUIDE_TYPE.CURSOR_EDIT_HANDLE,
         // TODO remove renderType
         renderType: RENDER_TYPE.LINE_STRING,
-        positionIndexes: [editHandles.length]
+        positionIndexes: [editHandles.length],
       },
       geometry: {
         type: GEOJSON_TYPE.POINT,
-        coordinates: [event.mapCoords]
-      }
+        coordinates: [event.mapCoords],
+      },
     };
     editHandles.push(cursorEditHandle);
 
@@ -60,13 +60,14 @@ export default class DrawLineStringMode extends BaseMode {
       ...tentativeFeature,
       geometry: {
         type: GEOJSON_TYPE.LINE_STRING,
-        coordinates: [...coordinates, event.mapCoords]
-      }
+        // @ts-ignore
+        coordinates: [...coordinates, event.mapCoords],
+      },
     };
 
     return {
       tentativeFeature,
-      editHandles
+      editHandles,
     };
   };
 
@@ -80,13 +81,15 @@ export default class DrawLineStringMode extends BaseMode {
       ...tentativeFeature,
       geometry: {
         type: GEOJSON_TYPE.LINE_STRING,
-        coordinates: [...tentativeFeature.geometry.coordinates, event.mapCoords]
-      }
+        // @ts-ignore
+        coordinates: [...tentativeFeature.geometry.coordinates, event.mapCoords],
+      },
     };
     this.setTentativeFeature(tentativeFeature);
 
     props.onEdit({
       editType: EDIT_TYPE.ADD_POSITION,
+      // @ts-ignore
       updatedData: props.data.getObject(),
       editContext: [
         {
@@ -94,9 +97,9 @@ export default class DrawLineStringMode extends BaseMode {
           featureIndex: null,
           editHandleIndex: tentativeFeature.geometry.coordinates.length - 1,
           screenCoords: event.screenCoords,
-          mapCoords: event.mapCoords
-        }
-      ]
+          mapCoords: event.mapCoords,
+        },
+      ],
     });
   };
 
@@ -114,16 +117,16 @@ export default class DrawLineStringMode extends BaseMode {
       properties: {
         id: tentativeFeature.properties.id,
         // todo deprecate renderType
-        renderType: RENDER_TYPE.LINE_STRING
-      }
+        renderType: RENDER_TYPE.LINE_STRING,
+      },
     };
-
+    // @ts-ignore
     const updatedData = data.addFeature(feature).getObject();
 
     props.onEdit({
       editType: EDIT_TYPE.ADD_FEATURE,
       updatedData,
-      editContext: null
+      editContext: null,
     });
   };
 
@@ -134,12 +137,13 @@ export default class DrawLineStringMode extends BaseMode {
         // TODO deprecate id & renderType
         id: uuid(),
         renderType: RENDER_TYPE.LINE_STRING,
-        guideType: GUIDE_TYPE.TENTATIVE
+        guideType: GUIDE_TYPE.TENTATIVE,
       },
+      // @ts-ignore
       geometry: {
         type: GEOJSON_TYPE.POINT,
-        coordinates: [event.mapCoords]
-      }
+        coordinates: [event.mapCoords],
+      },
     });
   };
 }

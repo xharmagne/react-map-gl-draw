@@ -1,7 +1,5 @@
-// @flow
-
-import type { MjolnirEvent } from 'mjolnir.js';
-import type { Feature, Position } from '@nebula.gl/edit-modes';
+import { MjolnirEvent } from 'mjolnir.js';
+import { Feature, Position } from '@nebula.gl/edit-modes';
 
 import { GEOJSON_TYPE } from '../constants';
 
@@ -23,15 +21,15 @@ export function parseEventElement(evt: MjolnirEvent) {
     object: {
       type,
       index: isNumeric(index) ? Number(index) : undefined,
-      featureIndex: isNumeric(featureIndex) ? Number(featureIndex) : undefined
+      featureIndex: isNumeric(featureIndex) ? Number(featureIndex) : undefined,
     },
-    index
+    index,
   };
 }
 
 export function getScreenCoords(evt: MjolnirEvent) {
   const {
-    offsetCenter: { x, y }
+    offsetCenter: { x, y },
   } = evt;
   return [Number(x), Number(y)];
 }
@@ -44,6 +42,7 @@ export function findClosestPointOnLineSegment(p1: Position, p2: Position, p: Pos
   // vertical line
   if (!isFinite(k)) {
     const q = [p1[0], p[1]];
+    // @ts-ignore
     return inBounds(p1, p2, q) ? q : null;
   }
 
@@ -77,16 +76,16 @@ export function updateRectanglePosition(
   if (!coordinates) {
     return null;
   }
-
+  // @ts-ignore
   const points = coordinates.slice(0, 4);
   points[editHandleIndex % 4] = mapCoords;
 
   /*
-  *   p0.x, p0.y (p0) ------ p2.x, p0.y (p1)
-  *       |                      |
-  *       |                      |
-  *   p0.x, p2.y (p3) ----- p2.x, p2.y (p2)
-  */
+   *   p0.x, p0.y (p0) ------ p2.x, p0.y (p1)
+   *       |                      |
+   *       |                      |
+   *   p0.x, p2.y (p3) ----- p2.x, p2.y (p2)
+   */
   const p0 = points[(editHandleIndex + 2) % 4];
   const p2 = points[editHandleIndex % 4];
   points[(editHandleIndex + 1) % 4] = [p2[0], p0[1]];
@@ -100,7 +99,7 @@ function inBounds(p1: Position, p2: Position, p: Position) {
     Math.min(p1[0], p2[0]),
     Math.max(p1[0], p2[0]),
     Math.min(p1[1], p2[1]),
-    Math.max(p1[1], p2[1])
+    Math.max(p1[1], p2[1]),
   ];
 
   return p[0] >= bounds[0] && p[0] <= bounds[1] && p[1] >= bounds[2] && p[1] <= bounds[3];

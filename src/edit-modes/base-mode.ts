@@ -1,6 +1,4 @@
-// @flow
-
-import type {
+import {
   EditMode,
   GuideFeatureCollection,
   Feature,
@@ -8,16 +6,18 @@ import type {
   PointerMoveEvent,
   StartDraggingEvent,
   StopDraggingEvent,
-  FeatureCollection
+  FeatureCollection,
+  Tooltip,
+  DraggingEvent,
 } from '@nebula.gl/edit-modes';
-import type { ModeProps } from '../types';
+import { ModeProps } from '../types';
 
 import { GEOJSON_TYPE, GUIDE_TYPE } from '../constants';
 import { getFeatureCoordinates, isNumeric } from './utils';
 
 export default class BaseMode implements EditMode<FeatureCollection, GuideFeatureCollection> {
-  _tentativeFeature: ?Feature;
-  _editHandles: ?(Feature[]);
+  _tentativeFeature: Feature | null | undefined;
+  _editHandles: Feature[] | null | undefined;
 
   constructor() {
     this._tentativeFeature = null;
@@ -36,7 +36,13 @@ export default class BaseMode implements EditMode<FeatureCollection, GuideFeatur
 
   handleStopDragging(event: StopDraggingEvent, props: ModeProps<FeatureCollection>) {}
 
-  getGuides(props: ModeProps<FeatureCollection>): ?Object {}
+  getGuides(props: ModeProps<FeatureCollection>): GuideFeatureCollection | null | undefined {
+    return null;
+  }
+  getTooltips(props: ModeProps<FeatureCollection>): Tooltip[] {
+    return [];
+  }
+  handleDragging(event: DraggingEvent, props: ModeProps<FeatureCollection>): void {}
 
   getTentativeFeature = () => {
     return this._tentativeFeature;
@@ -50,11 +56,12 @@ export default class BaseMode implements EditMode<FeatureCollection, GuideFeatur
     this._tentativeFeature = feature;
   };
 
-  getEditHandlesFromFeature(feature: Feature, featureIndex: ?number) {
+  getEditHandlesFromFeature(feature: Feature, featureIndex: number | null | undefined) {
     const coordinates = getFeatureCoordinates(feature);
     if (!coordinates) {
       return null;
     }
+    // @ts-ignore
     return coordinates.map((coord, i) => {
       return {
         type: 'Feature',
@@ -63,18 +70,22 @@ export default class BaseMode implements EditMode<FeatureCollection, GuideFeatur
           renderType: feature.properties.renderType,
           guideType: GUIDE_TYPE.EDIT_HANDLE,
           featureIndex,
-          positionIndexes: [i]
+          positionIndexes: [i],
         },
         geometry: {
           type: GEOJSON_TYPE.POINT,
-          coordinates: [coord]
-        }
+          coordinates: [coord],
+        },
       };
     });
   }
 
-  getSelectedFeature = (props: ModeProps<FeatureCollection>, featureIndex: ?number) => {
+  getSelectedFeature = (
+    props: ModeProps<FeatureCollection>,
+    featureIndex: number | null | undefined
+  ) => {
     const { data, selectedIndexes } = props;
+    // @ts-ignore
     const featureCollection = data.getObject();
     const features = featureCollection && featureCollection.features;
 

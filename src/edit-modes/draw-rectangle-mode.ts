@@ -1,8 +1,6 @@
-// @flow
-
-import type { Feature, ClickEvent, FeatureCollection } from '@nebula.gl/edit-modes';
+import { Feature, ClickEvent, FeatureCollection } from '@nebula.gl/edit-modes';
 import uuid from 'uuid/v1';
-import type { ModeProps } from '../types';
+import { ModeProps } from '../types';
 
 import { EDIT_TYPE, GEOJSON_TYPE, GUIDE_TYPE, RENDER_TYPE } from '../constants';
 import BaseMode from './base-mode';
@@ -18,10 +16,11 @@ export default class DrawRectangleMode extends BaseMode {
     }
   };
 
-  getEditHandlesFromFeature = (feature: Feature, featureIndex: ?number) => {
+  getEditHandlesFromFeature = (feature: Feature, featureIndex: number | null | undefined) => {
     const coordinates = getFeatureCoordinates(feature);
     return (
       coordinates &&
+      // @ts-ignore
       coordinates.map((coord, i) => {
         return {
           type: 'Feature',
@@ -30,17 +29,17 @@ export default class DrawRectangleMode extends BaseMode {
             renderType: RENDER_TYPE.RECTANGLE,
             guideType: GUIDE_TYPE.CURSOR_EDIT_HANDLE,
             featureIndex,
-            positionIndexes: [i]
+            positionIndexes: [i],
           },
           geometry: {
             type: GEOJSON_TYPE.POINT,
-            coordinates: [coord]
-          }
+            coordinates: [coord],
+          },
         };
       })
     );
   };
-
+  // @ts-ignore
   getGuides = (props: ModeProps<FeatureCollection>) => {
     let tentativeFeature = this.getTentativeFeature();
     const coordinates = getFeatureCoordinates(tentativeFeature);
@@ -59,19 +58,20 @@ export default class DrawRectangleMode extends BaseMode {
         // TODO deprecate id and renderType
         id: uuid(),
         guideType: GUIDE_TYPE.TENTATIVE,
-        renderType: RENDER_TYPE.RECTANGLE
+        renderType: RENDER_TYPE.RECTANGLE,
       },
       geometry: {
+        // @ts-ignore
         type: GEOJSON_TYPE.LINE_STRING,
-        coordinates: newCoordinates
-      }
+        coordinates: newCoordinates,
+      },
     };
-
+    // @ts-ignore
     const editHandles = this.getEditHandlesFromFeature(tentativeFeature);
 
     return {
       tentativeFeature,
-      editHandles
+      editHandles,
     };
   };
 
@@ -96,21 +96,22 @@ export default class DrawRectangleMode extends BaseMode {
         properties: {
           // TODO deprecate id
           id: tentativeFeature.properties.id,
-          renderType: RENDER_TYPE.RECTANGLE
+          renderType: RENDER_TYPE.RECTANGLE,
         },
         geometry: {
+          // @ts-ignore
           type: GEOJSON_TYPE.POLYGON,
-          coordinates: [coordinates]
-        }
+          coordinates: [coordinates],
+        },
       };
-
+      // @ts-ignore
       const updatedData = data.addFeature(tentativeFeature).getObject();
 
       // commit rectangle
       props.onEdit({
         editType: EDIT_TYPE.ADD_FEATURE,
         updatedData,
-        editContext: null
+        editContext: null,
       });
     }
   };
@@ -122,12 +123,12 @@ export default class DrawRectangleMode extends BaseMode {
         // TODO deprecate id
         id: uuid(),
         renderType: RENDER_TYPE.RECTANGLE,
-        guideType: GUIDE_TYPE.TENTATIVE
+        guideType: GUIDE_TYPE.TENTATIVE,
       },
       geometry: {
         type: 'LineString',
-        coordinates: [event.mapCoords, event.mapCoords, event.mapCoords, event.mapCoords]
-      }
+        coordinates: [event.mapCoords, event.mapCoords, event.mapCoords, event.mapCoords],
+      },
     });
   };
 }

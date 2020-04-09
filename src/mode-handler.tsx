@@ -1,11 +1,9 @@
-// @flow
-import { _MapContext as MapContext } from 'react-map-gl';
+import { _MapContext as MapContext, MapContextProps } from 'react-map-gl';
 import React, { PureComponent } from 'react';
-import { ImmutableFeatureCollection } from '@nebula.gl/edit-modes';
+import { ImmutableFeatureCollection, Feature, Position, EditAction } from '@nebula.gl/edit-modes';
 
-import type { Feature, Position, EditAction } from '@nebula.gl/edit-modes';
-import type { MjolnirEvent } from 'mjolnir.js';
-import type { BaseEvent, EditorProps, EditorState, SelectAction } from './types';
+import { MjolnirEvent } from 'mjolnir.js';
+import { BaseEvent, EditorProps, EditorState, SelectAction } from './types';
 import memoize from './memoize';
 
 import { getScreenCoords, parseEventElement } from './edit-modes/utils';
@@ -15,13 +13,13 @@ const defaultProps = {
   mode: null,
   features: null,
   onSelect: null,
-  onUpdate: null
+  onUpdate: null,
 };
 
 const defaultState = {
   featureCollection: new ImmutableFeatureCollection({
     type: 'FeatureCollection',
-    features: []
+    features: [],
   }),
 
   selectedFeatureIndex: null,
@@ -36,27 +34,28 @@ const defaultState = {
 
   pointerDownPicks: null,
   pointerDownScreenCoords: null,
-  pointerDownMapCoords: null
+  pointerDownMapCoords: null,
 };
 
 export default class ModeHandler extends PureComponent<EditorProps, EditorState> {
+  static displayName = 'ModeHandler';
   static defaultProps = defaultProps;
 
-  constructor() {
-    super();
+  constructor(props: EditorProps) {
+    super(props);
     this.state = defaultState;
     this._eventsRegistered = false;
 
     this._events = {
-      anyclick: evt => this._onEvent(this._onClick, evt, true),
-      click: evt => evt.stopImmediatePropagation(),
-      dblclick: evt => this._onEvent(this._onDblClick, evt, true),
-      pointermove: evt => this._onEvent(this._onPointerMove, evt, true),
-      pointerdown: evt => this._onEvent(this._onPointerDown, evt, true),
-      pointerup: evt => this._onEvent(this._onPointerUp, evt, true),
-      panmove: evt => this._onEvent(this._onPan, evt, false),
-      panstart: evt => this._onEvent(this._onPan, evt, false),
-      panend: evt => this._onEvent(this._onPan, evt, false)
+      anyclick: (evt) => this._onEvent(this._onClick, evt, true),
+      click: (evt) => evt.stopImmediatePropagation(),
+      dblclick: (evt) => this._onEvent(this._onDblClick, evt, true),
+      pointermove: (evt) => this._onEvent(this._onPointerMove, evt, true),
+      pointerdown: (evt) => this._onEvent(this._onPointerDown, evt, true),
+      pointerup: (evt) => this._onEvent(this._onPointerUp, evt, true),
+      panmove: (evt) => this._onEvent(this._onPan, evt, false),
+      panstart: (evt) => this._onEvent(this._onPan, evt, false),
+      panend: (evt) => this._onEvent(this._onPan, evt, false),
     };
   }
 
@@ -78,8 +77,8 @@ export default class ModeHandler extends PureComponent<EditorProps, EditorState>
   _events: any;
   _eventsRegistered: boolean;
   _modeHandler: any;
-  _context: ?MapContext;
-  _containerRef: ?HTMLElement;
+  _context: MapContextProps | null | undefined;
+  _containerRef: HTMLElement | null | undefined;
 
   getFeatures = () => {
     let featureCollection = this._getFeatureCollection();
@@ -108,7 +107,7 @@ export default class ModeHandler extends PureComponent<EditorProps, EditorState>
       }
       featureCollection = featureCollection.deleteFeatures(featureIndexes);
       const newState: any = { featureCollection };
-      if (featureIndexes.findIndex(index => selectedFeatureIndex === index) >= 0) {
+      if (featureIndexes.findIndex((index) => selectedFeatureIndex === index) >= 0) {
         newState.selectedFeatureIndex = null;
       }
       this.setState(newState);
@@ -129,7 +128,7 @@ export default class ModeHandler extends PureComponent<EditorProps, EditorState>
       viewport,
       featuresDraggable: this.props.featuresDraggable,
       onEdit: this._onEdit,
-      onSelect: this._onSelect
+      onSelect: this._onSelect,
     };
   }
 
@@ -144,20 +143,20 @@ export default class ModeHandler extends PureComponent<EditorProps, EditorState>
     if (features && features.type === 'FeatureCollection') {
       return new ImmutableFeatureCollection({
         type: 'FeatureCollection',
-        features: features.features
+        features: features.features,
       });
     }
 
     return new ImmutableFeatureCollection({
       type: 'FeatureCollection',
-      features: features || []
+      features: features || [],
     });
   });
 
   _getFeatureCollection = () => {
     return this._getMemorizedFeatureCollection({
       propsFeatures: this.props.features,
-      stateFeatures: this.state.featureCollection
+      stateFeatures: this.state.featureCollection,
     });
   };
 
@@ -185,7 +184,7 @@ export default class ModeHandler extends PureComponent<EditorProps, EditorState>
       pointerDownMapCoords: null,
 
       isDragging: false,
-      didDrag: false
+      didDrag: false,
     });
   };
 
@@ -203,7 +202,7 @@ export default class ModeHandler extends PureComponent<EditorProps, EditorState>
     }
   };
 
-  _onEdit = (editAction: EditAction) => {
+  _onEdit = (editAction: EditAction<any>) => {
     const { editType, updatedData, editContext } = editAction;
     this.setState({ featureCollection: new ImmutableFeatureCollection(updatedData) });
 
@@ -214,7 +213,7 @@ export default class ModeHandler extends PureComponent<EditorProps, EditorState>
           selectedFeatureIndex: null,
           selectedEditHandleIndex: null,
           screenCoords: editContext && editContext.screenCoords,
-          mapCoords: editContext && editContext.mapCoords
+          mapCoords: editContext && editContext.mapCoords,
         });
         break;
       default:
@@ -224,7 +223,7 @@ export default class ModeHandler extends PureComponent<EditorProps, EditorState>
       this.props.onUpdate({
         data: updatedData && updatedData.features,
         editType,
-        editContext
+        editContext,
       });
     }
   };
@@ -284,7 +283,7 @@ export default class ModeHandler extends PureComponent<EditorProps, EditorState>
       didDrag,
       pointerDownPicks,
       pointerDownScreenCoords,
-      pointerDownMapCoords
+      pointerDownMapCoords,
     } = this.state;
 
     if (isDragging && !didDrag && pointerDownScreenCoords) {
@@ -300,7 +299,7 @@ export default class ModeHandler extends PureComponent<EditorProps, EditorState>
       isDragging,
       pointerDownPicks,
       pointerDownScreenCoords,
-      pointerDownMapCoords
+      pointerDownMapCoords,
     };
 
     if (this.state.didDrag) {
@@ -310,7 +309,8 @@ export default class ModeHandler extends PureComponent<EditorProps, EditorState>
 
     this.setState({
       hovered,
-      lastPointerMoveEvent: pointerMoveEvent
+      // @ts-ignore
+      lastPointerMoveEvent: pointerMoveEvent,
     });
   };
 
@@ -319,16 +319,16 @@ export default class ModeHandler extends PureComponent<EditorProps, EditorState>
       ...event,
       isDragging: true,
       pointerDownScreenCoords: event.screenCoords,
-      pointerDownMapCoords: event.mapCoords
+      pointerDownMapCoords: event.mapCoords,
     };
 
     const newState = {
       isDragging: true,
       pointerDownPicks: event.picks,
       pointerDownScreenCoords: event.screenCoords,
-      pointerDownMapCoords: event.mapCoords
+      pointerDownMapCoords: event.mapCoords,
     };
-
+    // @ts-ignore
     this.setState(newState);
 
     const modeProps = this.getModeProps();
@@ -342,7 +342,7 @@ export default class ModeHandler extends PureComponent<EditorProps, EditorState>
       isDragging: false,
       pointerDownPicks: didDrag ? pointerDownPicks : null,
       pointerDownScreenCoords: didDrag ? pointerDownScreenCoords : null,
-      pointerDownMapCoords: didDrag ? pointerDownMapCoords : null
+      pointerDownMapCoords: didDrag ? pointerDownMapCoords : null,
     };
 
     const newState = {
@@ -350,7 +350,7 @@ export default class ModeHandler extends PureComponent<EditorProps, EditorState>
       didDrag: false,
       pointerDownPicks: null,
       pointerDownScreenCoords: null,
-      pointerDownMapCoords: null
+      pointerDownMapCoords: null,
     };
 
     this.setState(newState);
@@ -372,24 +372,27 @@ export default class ModeHandler extends PureComponent<EditorProps, EditorState>
   /* HELPERS */
   project = (pt: Position) => {
     const viewport = this._context && this._context.viewport;
+    // @ts-ignore
     return viewport && viewport.project(pt);
   };
 
   unproject = (pt: Position) => {
     const viewport = this._context && this._context.viewport;
+    // @ts-ignore
     return viewport && viewport.unproject(pt);
   };
 
   _getEvent(evt: MjolnirEvent) {
     const picked = parseEventElement(evt);
     const screenCoords = getScreenCoords(evt);
+    // @ts-ignore
     const mapCoords = this.unproject(screenCoords);
 
     return {
       picks: picked ? [picked] : null,
       screenCoords,
       mapCoords,
-      sourceEvent: evt
+      sourceEvent: evt,
     };
   }
 
@@ -402,7 +405,7 @@ export default class ModeHandler extends PureComponent<EditorProps, EditorState>
     return {
       screenCoords: event.screenCoords,
       mapCoords: event.mapCoords,
-      ...object
+      ...object,
     };
   };
 
@@ -413,7 +416,7 @@ export default class ModeHandler extends PureComponent<EditorProps, EditorState>
   render() {
     return (
       <MapContext.Consumer>
-        {context => {
+        {(context) => {
           this._context = context;
           const viewport = context && context.viewport;
 
@@ -427,5 +430,3 @@ export default class ModeHandler extends PureComponent<EditorProps, EditorState>
     );
   }
 }
-
-ModeHandler.displayName = 'ModeHandler';

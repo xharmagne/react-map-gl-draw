@@ -1,14 +1,12 @@
-// @flow
-
-import type {
+import {
   Feature,
   FeatureCollection,
   ClickEvent,
   StopDraggingEvent,
   PointerMoveEvent,
-  Position
+  Position,
 } from '@nebula.gl/edit-modes';
-import type { ModeProps } from '../types';
+import { ModeProps } from '../types';
 
 import { RENDER_TYPE, EDIT_TYPE, ELEMENT_TYPE, GEOJSON_TYPE, GUIDE_TYPE } from '../constants';
 // import BaseMode from './base-mode';
@@ -17,7 +15,7 @@ import {
   findClosestPointOnLineSegment,
   getFeatureCoordinates,
   isNumeric,
-  updateRectanglePosition
+  updateRectanglePosition,
 } from './utils';
 
 export default class EditingMode extends SelectMode {
@@ -42,12 +40,14 @@ export default class EditingMode extends SelectMode {
       if (!coordinates) {
         return;
       }
+      // @ts-ignore
       const insertIndex = (index + 1) % coordinates.length;
       const positionIndexes =
         feature.geometry.type === RENDER_TYPE.POLYGON ? [0, insertIndex] : [insertIndex];
       const insertMapCoords = this._getPointOnSegment(feature, pickedObject, event.mapCoords);
 
       const updatedData = props.data
+        // @ts-ignore
         .addPosition(featureIndex, positionIndexes, insertMapCoords)
         .getObject();
 
@@ -58,10 +58,11 @@ export default class EditingMode extends SelectMode {
           {
             featureIndex,
             editHandleIndex: insertIndex,
+            // @ts-ignore
             screenCoords: props.viewport && props.viewport.project(insertMapCoords),
-            mapCoords: insertMapCoords
-          }
-        ]
+            mapCoords: insertMapCoords,
+          },
+        ],
       });
     }
   };
@@ -78,6 +79,7 @@ export default class EditingMode extends SelectMode {
       case ELEMENT_TYPE.FILL:
       case ELEMENT_TYPE.EDIT_HANDLE:
         this._handleDragging(event, props);
+
         break;
       default:
     }
@@ -88,8 +90,10 @@ export default class EditingMode extends SelectMode {
     props: ModeProps<FeatureCollection>
   ) => {
     const { onEdit } = props;
+    // @ts-ignore
     const selectedFeature = this.getSelectedFeature(props);
     // nothing clicked
+    // @ts-ignore
     const { isDragging, pointerDownPicks, screenCoords } = event;
     const { lastPointerMoveEvent } = props;
 
@@ -110,15 +114,15 @@ export default class EditingMode extends SelectMode {
       case ELEMENT_TYPE.SEGMENT:
         if (!props.featuresDraggable) {
           break;
-        }
-        // dragging feature
+        } // dragging feature
+
         const dx = screenCoords[0] - lastPointerMoveEvent.screenCoords[0];
         const dy = screenCoords[1] - lastPointerMoveEvent.screenCoords[1];
         updatedData = this._updateFeature(props, 'feature', { dx, dy });
         onEdit({
           editType,
           updatedData,
-          editContext: null
+          editContext: null,
         });
         break;
 
@@ -131,13 +135,12 @@ export default class EditingMode extends SelectMode {
             : 'editHandle';
         updatedData = this._updateFeature(props, updateType, {
           editHandleIndex,
-          mapCoords: event.mapCoords
+          mapCoords: event.mapCoords,
         });
-
         onEdit({
           editType,
           updatedData,
-          editContext: null
+          editContext: null,
         });
         break;
 
@@ -147,11 +150,12 @@ export default class EditingMode extends SelectMode {
 
   handlePointerMove = (event: PointerMoveEvent, props: ModeProps<FeatureCollection>) => {
     // no selected feature
+    // @ts-ignore
     const selectedFeature = this.getSelectedFeature(props);
     if (!selectedFeature) {
       return;
     }
-
+    // @ts-ignore
     if (!event.isDragging) {
       return;
     }
@@ -180,13 +184,14 @@ export default class EditingMode extends SelectMode {
           feature.geometry.type === GEOJSON_TYPE.POLYGON
             ? [0, options.editHandleIndex]
             : [options.editHandleIndex];
-
+        // @ts-ignore
         return data.replacePosition(featureIndex, positionIndexes, options.mapCoords).getObject();
 
       case 'feature':
         const { dx, dy } = options;
         newCoordinates = newCoordinates
-          .map(mapCoords => {
+          .map((mapCoords) => {
+            // @ts-ignore
             const pixels = viewport && viewport.project(mapCoords);
             if (pixels) {
               pixels[0] += dx;
@@ -196,13 +201,12 @@ export default class EditingMode extends SelectMode {
             return null;
           })
           .filter(Boolean);
-
         geometry = {
           type: feature.geometry.type,
           coordinates:
-            feature.geometry.type === GEOJSON_TYPE.POLYGON ? [newCoordinates] : newCoordinates
+            feature.geometry.type === GEOJSON_TYPE.POLYGON ? [newCoordinates] : newCoordinates,
         };
-
+        // @ts-ignore
         return data.replaceGeometry(featureIndex, geometry).getObject();
 
       case 'rectangle':
@@ -212,15 +216,15 @@ export default class EditingMode extends SelectMode {
           options.editHandleIndex,
           options.mapCoords
         );
-
         geometry = {
           type: GEOJSON_TYPE.POLYGON,
-          coordinates: newCoordinates
+          coordinates: newCoordinates,
         };
-
+        // @ts-ignore
         return data.replaceGeometry(featureIndex, geometry).getObject();
 
       default:
+        // @ts-ignore
         return data && data.getObject();
     }
   };
@@ -240,6 +244,7 @@ export default class EditingMode extends SelectMode {
   }
 
   _getCursorEditHandle = (event: PointerMoveEvent, feature: Feature) => {
+    // @ts-ignore
     const { isDragging, picks } = event;
     // if not pick segment
     const pickedObject = picks && picks[0] && picks[0].object;
@@ -271,16 +276,17 @@ export default class EditingMode extends SelectMode {
       properties: {
         guideType: GUIDE_TYPE.CURSOR_EDIT_HANDLE,
         renderType: feature.properties.renderType,
-        positionIndexes: [null]
+        positionIndexes: [null],
       },
       geometry: {
         type: GEOJSON_TYPE.POINT,
-        coordinates: [insertMapCoords]
-      }
+        coordinates: [insertMapCoords],
+      },
     };
   };
-
+  // @ts-ignore
   getGuides = (props: ModeProps<FeatureCollection>) => {
+    // @ts-ignore
     const selectedFeature = this.getSelectedFeature(props);
     const selectedFeatureIndex = props.selectedIndexes && props.selectedIndexes[0];
 
@@ -300,7 +306,7 @@ export default class EditingMode extends SelectMode {
     }
 
     return {
-      editHandles: editHandles.length ? editHandles : null
+      editHandles: editHandles.length ? editHandles : null,
     };
   };
 }

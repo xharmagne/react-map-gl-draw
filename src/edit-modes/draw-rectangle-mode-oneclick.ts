@@ -1,11 +1,5 @@
-// @flow
-
-import type {
-  FeatureCollection,
-  StartDraggingEvent,
-  StopDraggingEvent
-} from '@nebula.gl/edit-modes';
-import type { ModeProps } from '../types';
+import { FeatureCollection, StartDraggingEvent, StopDraggingEvent } from '@nebula.gl/edit-modes';
+import { ModeProps } from '../types';
 
 import DrawRectangleMode from './draw-rectangle-mode';
 
