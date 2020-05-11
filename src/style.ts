@@ -12,24 +12,25 @@ const RECT_STYLE = {
 const CIRCLE_RADIUS = 8;
 
 const SELECTED_STYLE = {
-  stroke: '#7ac943',
+  stroke: 'rgb(38, 181, 242)',
   strokeWidth: 2,
-  fill: '#ffff00',
-  fillOpacity: 0.7,
+  fill: 'rgb(189,189,189)',
+  fillOpacity: 0.3,
 };
 
 const HOVERED_STYLE = {
-  stroke: '#7ac943',
+  stroke: 'rgb(38, 181, 242)',
   strokeWidth: 2,
-  fill: '#7ac943',
-  fillOpacity: 0.5,
+  fill: 'rgb(122,202,67)',
+  fillOpacity: 0.3,
 };
 
 const UNCOMMITTED_STYLE = {
-  stroke: '#a7a7a7',
+  stroke: 'rgb(189,189,189)',
+  strokeDasharray: '4,2',
   strokeWidth: 2,
-  fill: '#a9a9a9',
-  fillOpacity: 0.3,
+  fill: 'rgb(189,189,189)',
+  fillOpacity: 0.1,
 };
 
 const INACTIVE_STYLE = UNCOMMITTED_STYLE;
