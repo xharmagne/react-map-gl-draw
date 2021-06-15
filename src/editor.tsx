@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { Feature, Tooltip } from '@nebula.gl/edit-modes';
-import { GeoJsonType, RenderState, Id } from './types';
+import { GeoJsonType, RenderState, Id, EditorProps, EditorState } from './types';
 
 import { RENDER_STATE, SHAPE, GEOJSON_TYPE, GUIDE_TYPE, ELEMENT_TYPE } from './constants';
 import ModeHandler from './mode-handler';
@@ -26,6 +26,30 @@ const defaultProps = {
 
 export default class Editor extends ModeHandler {
   static defaultProps = defaultProps;
+
+  _tooltipsRef: SVGGElement | null | undefined;
+
+  componentDidUpdate(prevProps: EditorProps, prevState: EditorState) {
+    super.componentDidUpdate(prevProps, prevState);
+    if (this._tooltipsRef) {
+      const textElements = this._tooltipsRef.querySelectorAll('text');
+      const textExtents = {};
+      for (let i = 0; i < textElements.length; i++) {
+        const box = textElements[i].getBBox();
+        textExtents[textElements[i].id] = {
+          width: box.width,
+          height: box.height,
+          x: box.x,
+          y: box.y,
+        };
+      }
+
+      if (JSON.stringify(prevState.textExtents) !== JSON.stringify(textExtents)) {
+        this.setState({ textExtents });
+      }
+    }
+  }
+
 
   /* HELPERS */
   _getPathInScreenCoords(coordinates: any, type: GeoJsonType) {
@@ -372,16 +396,39 @@ export default class Editor extends ModeHandler {
   };
 
   _renderTooltips = (tooltips: Tooltip[]) => {
-    const style = this._getStyleProp(this.props.tooltipStyle, null);
+    const textStyle = this._getStyleProp(this.props.tooltipStyle?.text, null);
+    const bgStyle = this._getStyleProp(this.props.tooltipStyle?.rect, null);
     return (
-      <g key="feature-tooltips">
+      <g
+        key="feature-tooltips"
+        ref={(g) => {
+          this._tooltipsRef = g;
+        }}
+      >
         {tooltips.map((tooltip, index) => {
           const elemKey = `${ELEMENT_TYPE.TOOLTIP}.${index}`;
           const screenCoords = this.project([tooltip.position[0], tooltip.position[1]]);
-          return (
-            <text key={elemKey} x={screenCoords[0]} y={screenCoords[1]} style={style}>
+          const label = (
+            <text id={elemKey} x={screenCoords[0]} y={screenCoords[1]} style={textStyle}>
               {tooltip.text}
             </text>
+          );
+          const extents = this.state.textExtents[elemKey];
+          const margin = 8;
+          const background = extents ? (
+            <rect
+              x={extents.x - margin}
+              y={extents.y - margin}
+              width={extents.width + 2 * margin}
+              height={extents.height + 2 * margin}
+              style={bgStyle}
+            />
+          ) : null;
+          return (
+            <g key={elemKey}>
+              {background}
+              {label}
+            </g>
           );
         })}
       </g>

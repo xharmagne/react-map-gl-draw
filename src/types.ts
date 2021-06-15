@@ -45,7 +45,7 @@ export type EditorProps = {
   editHandleShape?: Function | string;
   editHandleStyle?: Function | any;
   featureStyle?: Function | any;
-  tooltipStyle?: CSSProperties;
+  tooltipStyle?: { text?: CSSProperties; rect?: CSSProperties };
   featuresDraggable?: boolean | null | undefined;
   onUpdate?: Function;
   onSelect?: Function;
@@ -68,6 +68,8 @@ export type EditorState = {
   pointerDownPicks: Pick[] | null | undefined;
   pointerDownScreenCoords: ScreenCoordinates | null | undefined;
   pointerDownMapCoords: Position | null | undefined;
+
+  textExtents: Record<string, { width: number; height: number; x: number; y: number }>;
 };
 
 export type BaseEvent = ClickEvent;

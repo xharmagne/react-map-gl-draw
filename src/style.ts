@@ -134,4 +134,11 @@ export function editHandleStyle({ feature, shape, index, state }) {
 export const tooltipStyle = {
   fill: 'black',
   fontSize: 14,
+  text: {
+		fill: 'black',
+		fontSize: 14,
+	},
+	rect: {
+		fill: 'gray',
+	},
 };

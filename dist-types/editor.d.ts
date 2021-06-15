@@ -1,6 +1,6 @@
 /// <reference types="react" />
 import { Feature, Tooltip } from '@nebula.gl/edit-modes';
-import { GeoJsonType } from './types';
+import { GeoJsonType, EditorProps, EditorState } from './types';
 import { RENDER_STATE } from './constants';
 import ModeHandler from './mode-handler';
 import { editHandleStyle as defaultEditHandleStyle, featureStyle as defaultFeatureStyle } from './style';
@@ -14,6 +14,13 @@ export default class Editor extends ModeHandler {
         tooltipStyle: {
             fill: string;
             fontSize: number;
+            text: {
+                fill: string;
+                fontSize: number;
+            };
+            rect: {
+                fill: string;
+            };
         };
         featuresDraggable: boolean;
         selectable: boolean;
@@ -23,6 +30,8 @@ export default class Editor extends ModeHandler {
         onUpdate: any;
         onUpdateCursor: () => void;
     };
+    _tooltipsRef: SVGGElement | null | undefined;
+    componentDidUpdate(prevProps: EditorProps, prevState: EditorState): void;
     _getPathInScreenCoords(coordinates: any, type: GeoJsonType): any;
     _getEditHandleState: (editHandle: Feature, renderState: string) => string;
     _getFeatureRenderState: (index: number, renderState: RENDER_STATE) => RENDER_STATE.INACTIVE | RENDER_STATE.INACTIVE | RENDER_STATE.UNCOMMITTED | RENDER_STATE;

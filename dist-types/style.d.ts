@@ -11,5 +11,12 @@ export declare function editHandleStyle({ feature, shape, index, state }: {
 export declare const tooltipStyle: {
     fill: string;
     fontSize: number;
+    text: {
+        fill: string;
+        fontSize: number;
+    };
+    rect: {
+        fill: string;
+    };
 };
 //# sourceMappingURL=style.d.ts.map

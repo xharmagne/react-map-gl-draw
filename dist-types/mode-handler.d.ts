@@ -15,7 +15,7 @@ export default class ModeHandler extends React.PureComponent<EditorProps, Editor
     };
     constructor(props: EditorProps);
     componentDidMount(): void;
-    componentDidUpdate(prevProps: EditorProps): void;
+    componentDidUpdate(prevProps: EditorProps, _: EditorState): void;
     componentWillUnmount(): void;
     _events: any;
     _eventsRegistered: boolean;

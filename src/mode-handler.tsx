@@ -44,6 +44,8 @@ const defaultState = {
   pointerDownPicks: null,
   pointerDownScreenCoords: null,
   pointerDownMapCoords: null,
+
+  textExtents: {}
 };
 
 export default class ModeHandler extends React.PureComponent<EditorProps, EditorState> {
@@ -72,7 +74,7 @@ export default class ModeHandler extends React.PureComponent<EditorProps, Editor
     this._setupModeHandler();
   }
 
-  componentDidUpdate(prevProps: EditorProps) {
+  componentDidUpdate(prevProps: EditorProps, _: EditorState) {
     if (prevProps.mode !== this.props.mode) {
       this._clearEditingState();
       this._setupModeHandler();
