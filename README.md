@@ -88,6 +88,10 @@ Returns is a map of [style objects](https://reactjs.org/docs/dom-elements.html#s
   - `index`: index of the editHandle vertex in the feature.
   - `state`: one of `SELECTED`, `HOVERED`, `INACTIVE`, `UNCOMMITTED`, `CLOSING`.
 
+- `tooltipStyle`: Optional Object with the following optional properties
+  - `text`: SVG style properties for tooltip text
+  - `rect`: SVG style properties for the rectangle that serves as tooltip text background
+
 ## Explanations
 
 - `Feature`: any drawn shape, one of point, line, polygon or rectangle.

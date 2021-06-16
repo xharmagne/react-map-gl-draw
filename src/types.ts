@@ -1,4 +1,4 @@
-import { CSSProperties } from 'react';
+import { CSSProperties, SVGAttributes } from 'react';
 import { WebMercatorViewport } from 'viewport-mercator-project';
 import {
   ModeProps as BaseModeProps,
@@ -45,7 +45,10 @@ export type EditorProps = {
   editHandleShape?: Function | string;
   editHandleStyle?: Function | any;
   featureStyle?: Function | any;
-  tooltipStyle?: { text?: CSSProperties; rect?: CSSProperties };
+  tooltipStyle?: { 
+    text?: CSSProperties | SVGAttributes<SVGTextElement>;
+    rect?: CSSProperties | SVGAttributes<SVGRectElement>;
+  };
   featuresDraggable?: boolean | null | undefined;
   onUpdate?: Function;
   onSelect?: Function;

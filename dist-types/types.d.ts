@@ -1,4 +1,4 @@
-import { CSSProperties } from 'react';
+import { CSSProperties, SVGAttributes } from 'react';
 import { WebMercatorViewport } from 'viewport-mercator-project';
 import { ModeProps as BaseModeProps, Feature, ImmutableFeatureCollection, PointerMoveEvent, Pick, ClickEvent, ScreenCoordinates } from '@nebula.gl/edit-modes';
 import { RENDER_STATE, GEOJSON_TYPE, RENDER_TYPE } from './constants';
@@ -30,8 +30,8 @@ export declare type EditorProps = {
     editHandleStyle?: Function | any;
     featureStyle?: Function | any;
     tooltipStyle?: {
-        text?: CSSProperties;
-        rect?: CSSProperties;
+        text?: CSSProperties | SVGAttributes<SVGTextElement>;
+        rect?: CSSProperties | SVGAttributes<SVGRectElement>;
     };
     featuresDraggable?: boolean | null | undefined;
     onUpdate?: Function;
